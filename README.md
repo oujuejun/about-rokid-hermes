@@ -45,6 +45,10 @@ curl -s http://127.0.0.1:8790/health   # 秒级存活
 pkill -f "h4dex-bridge/.venv/bin/python src/main.py"; bash scripts/rokid-shim-keepalive.sh
 ```
 
+本地补丁（0911 定稿，bridge 仓维持本地 commit `bee4778`，不推上游）：
+- `src/main.py` 仅一行改动：`@app.post("/metis/agent/api/sse")` —— 接受灵珠后台回调 URL 路径的别名，防 404。**git pull 会覆盖，拉完必须补回**（commit 内含说明）。
+- 心跳/重试等其他补丁已全部回滚（基拉裁定），保持 SSE_HEARTBEAT_INTERVAL=30 原样。
+
 已知坑（全录于 skill `rokid-glasses-dev`）：
 - 换 AK 前先在灵珠后台同步，否则云端缓存旧 key → 401 → 眼镜端"正在思考"卡死
 - 重启 Gateway 用 `launchctl kickstart -k gui/501/ai.hermes.gateway`，先确认旧进程退净，防 Errno 48 端口占用导致 api_server 起不来
